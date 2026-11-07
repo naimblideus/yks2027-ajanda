@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YKS 2027 Ajandam</title>
+<meta name="theme-color" content="#F3F0EF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="YKS Ajandam">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>:root{padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600;1,700&display=swap">
+<style>
+/* Düzen: tek sütun ajanda sayfası, altta sabit sekme çubuğu; kurdeleli pudra pembe, açık gri kâğıt zemin */
+:root{
+  --bg:#F3F0EF; --kagit:#FFFFFF; --murekkep:#2B2427; --soluk:#887B80; --cizgi:#EADFE2;
+  --gul:#E9A8B8; --gul-koyu:#B85A74; --pudra:#F9E2E8; --pudra-acik:#FCF1F4;
+  --lila:#D9C6E6; --lila-koyu:#8F6FB0; --seftali:#F6D3B8; --ada:#C9E0D3; --sari:#F6D98A;
+  --f-el:'Dancing Script','Segoe Script','Brush Script MT',cursive;
+  --f-govde:'Nunito','Segoe UI',system-ui,-apple-system,sans-serif;
+  --golge:0 1px 2px rgba(120,60,80,.06),0 6px 18px rgba(120,60,80,.06);
+  --kalp-maske:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 21.5s-8.2-5-10.4-10C.1 7.9 2.3 4 6.2 4c2.3 0 4 1.2 5.8 3.4C13.8 5.2 15.5 4 17.8 4c3.9 0 6.1 3.9 4.6 7.5-2.2 5-10.4 10-10.4 10Z'/></svg>");
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--murekkep);font-family:var(--f-govde);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 calc(84px + env(safe-area-inset-bottom,0px))}
+a{color:var(--gul-koyu)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gul-koyu);outline-offset:2px;border-radius:8px}
+.kap{max-width:760px;margin:0 auto}
+.gizli-svg{position:absolute;width:0;height:0;overflow:hidden}
+
+/* üst başlık */
+.ust{position:relative;padding-block:22px 6px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.ust h1{font-family:var(--f-el);font-weight:700;font-size:clamp(44px,11vw,64px);line-height:.95;margin:0;letter-spacing:.5px}
+.ust .alt{font-style:italic;font-weight:600;color:var(--soluk);margin-top:4px}
+.kurdele{width:78px;height:60px;flex:none;transform:rotate(-8deg);filter:drop-shadow(0 2px 3px rgba(184,90,116,.18))}
+.sticker{position:absolute;pointer-events:none}
+
+/* ortak kutular */
+.kart{background:var(--kagit);border:1px solid var(--cizgi);border-radius:18px;box-shadow:var(--golge);padding:16px}
+.yigin{display:grid;gap:14px}
+.etiket{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--soluk)}
+h2.el{font-family:var(--f-el);font-weight:700;font-size:34px;line-height:1;margin:0}
+h3{font-size:16px;margin:0;font-weight:800;text-wrap:balance}
+.kucuk{font-size:13px;color:var(--soluk)}
+.cipler{display:flex;flex-wrap:wrap;gap:8px}
+.cip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--pudra-acik);border:1px solid var(--cizgi);font-size:13px;font-weight:700;white-space:nowrap}
+.cip b{font-variant-numeric:tabular-nums;color:var(--gul-koyu)}
+.cip.dolu{background:var(--gul);border-color:var(--gul);color:#fff}
+.cip.dolu b{color:#fff}
+
+/* durum şeridi */
+.durum{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.halka{width:74px;height:74px}
+.durum .buyuk{font-size:24px;font-weight:800;line-height:1.15}
+.durum .buyuk.geri{color:var(--gul-koyu)}
+
+/* gün gezgini */
+.gezgin{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gezgin button{border:1px solid var(--cizgi);background:var(--kagit);border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:13px}
+.gezgin button:hover{background:var(--pudra-acik)}
+.gezgin .gun{font-family:var(--f-el);font-size:30px;font-weight:700;text-align:center;line-height:1.05}
+
+/* görev listesi */
+.grup-baslik{display:flex;align-items:center;gap:8px;margin:2px 0 6px}
+.nokta{width:10px;height:10px;border-radius:50%;flex:none;background:var(--gul)}
+.n-mat{background:var(--gul)} .n-geo{background:var(--lila)} .n-tr{background:var(--seftali)} .n-sos{background:var(--ada)} .n-gun{background:var(--sari)}
+.gorev{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 2px;border-top:1px dashed var(--cizgi)}
+.gorev:first-of-type{border-top:0}
+.gorev .ad{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.gorev .ad small{display:block;font-weight:600;color:var(--soluk);font-size:12.5px}
+.gorev.bitti .ad{color:var(--soluk);text-decoration:line-through;text-decoration-color:var(--gul)}
+.asama{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--pudra);color:var(--gul-koyu);margin-right:6px;white-space:nowrap}
+.izle{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:800;text-decoration:none;padding:5px 10px;border-radius:999px;border:1px solid var(--gul);color:var(--gul-koyu);white-space:nowrap}
+.izle:hover{background:var(--pudra-acik)}
+
+/* kalp işaret kutusu */
+.kalp{width:34px;height:34px;border:0;background:none;padding:0;cursor:pointer;display:grid;place-items:center;flex:none}
+.kalp svg{width:28px;height:28px;fill:transparent;stroke:var(--gul-koyu);stroke-width:1.6;transition:transform .18s ease,fill .18s ease}
+.kalp.on svg{fill:var(--gul);stroke:var(--gul-koyu);transform:scale(1.08)}
+.kalp:active svg{transform:scale(.9)}
+@media (prefers-reduced-motion:reduce){.kalp svg{transition:none}}
+
+/* aşama çipleri (konular) */
+.konu{padding:12px 0;border-top:1px dashed var(--cizgi);display:grid;gap:8px}
+.konu:first-child{border-top:0}
+.konu-ust{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.konu-ust h3{min-width:0}
+.rozet{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--pudra-acik);color:var(--soluk);border:1px solid var(--cizgi)}
+.rozet.r1{background:var(--pudra);color:var(--gul-koyu);border-color:var(--pudra)}
+.rozet.r2,.rozet.r3,.rozet.r4{background:var(--gul);color:#fff;border-color:var(--gul)}
+.rozet.r4{background:var(--gul-koyu);border-color:var(--gul-koyu)}
+.adimlar{display:flex;flex-wrap:wrap;gap:6px}
+.adim{border:1px solid var(--gul);background:var(--kagit);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:800;cursor:pointer;display:inline-flex;gap:5px;align-items:center}
+.adim.on{background:var(--gul);color:#fff}
+.adim.yari{background:linear-gradient(90deg,var(--pudra) 0 var(--y,50%),var(--kagit) var(--y,50%))}
+.videolar{display:grid;gap:2px;padding:4px 0 0 8px;border-left:2px solid var(--pudra)}
+
+/* ilerleme çubuğu */
+.cubuk{height:8px;border-radius:999px;background:var(--pudra-acik);border:1px solid var(--cizgi);overflow:hidden}
+.cubuk i{display:block;height:100%;background:linear-gradient(90deg,var(--gul),var(--gul-koyu));border-radius:999px}
+
+/* ders seçici */
+.secici{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.secici button{flex:none;border:1px solid var(--cizgi);background:var(--kagit);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.secici button.on{background:var(--murekkep);color:#fff;border-color:var(--murekkep)}
+
+/* program */
+.fazlar{position:relative;display:grid;grid-template-columns:12fr 11fr 9fr;gap:4px}
+.faz{border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;min-width:0}
+.faz small{display:block;font-weight:600;color:var(--soluk)}
+.faz.f1{background:var(--pudra)} .faz.f2{background:#EFE4F4} .faz.f3{background:#FBEBDD}
+.imlec{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--gul-koyu);border-radius:2px}
+.imlec::after{content:'bugün';position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;color:var(--gul-koyu)}
+details.hafta{background:var(--kagit);border:1px solid var(--cizgi);border-radius:16px;padding:0 14px}
+details.hafta[open]{box-shadow:var(--golge)}
+details.hafta.simdi{border-color:var(--gul)}
+details.hafta summary{list-style:none;cursor:pointer;padding:12px 0;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+details.hafta summary::-webkit-details-marker{display:none}
+.hafta-ic{padding:0 0 14px;display:grid;gap:8px}
+.hedef{display:grid;grid-template-columns:110px 1fr;gap:8px;font-size:13.5px}
+.hedef b{font-weight:800}
+.not{background:var(--pudra-acik);border:1px dashed var(--gul);border-radius:12px;padding:10px 12px;font-size:13.5px}
+
+/* takvim */
+.takvim{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.takvim .gb{font-size:11px;font-weight:800;color:var(--soluk);padding-bottom:2px}
+.takvim .g{position:relative;aspect-ratio:1;max-width:100%;display:grid;place-items:center;font-size:13px;font-weight:700;border-radius:10px;font-variant-numeric:tabular-nums}
+.takvim .g.bos{visibility:hidden}
+.takvim .g.plan{background:var(--pudra-acik)}
+.takvim .g.yarim{background:var(--pudra)}
+.takvim .g.tam{color:#fff}
+.takvim .g.tam::before{content:'';position:absolute;inset:3px;background:var(--gul);-webkit-mask:var(--kalp-maske) center/contain no-repeat;mask:var(--kalp-maske) center/contain no-repeat}
+.takvim .g span{position:relative}
+.takvim .g.bugun{outline:2px solid var(--gul-koyu)}
+.takvim .g.sinav{background:var(--murekkep);color:#fff}
+.ay-bas{display:flex;justify-content:space-between;align-items:center}
+.ay-bas .ay{font-style:italic;font-weight:700;font-size:20px}
+
+/* formlar */
+label.alan{display:grid;gap:4px;font-size:12.5px;font-weight:700;color:var(--soluk);min-width:0}
+input,select,textarea{font:inherit;color:var(--murekkep);background:var(--pudra-acik);border:1px solid var(--cizgi);border-radius:12px;padding:8px 10px;width:100%;min-width:0}
+textarea{resize:vertical;font-size:13px}
+input:focus,select:focus,textarea:focus{border-color:var(--gul);outline:none;box-shadow:0 0 0 3px var(--pudra)}
+.izgara{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.dugme{border:0;background:var(--gul-koyu);color:#fff;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}
+.dugme.ikincil{background:var(--kagit);color:var(--gul-koyu);border:1px solid var(--gul)}
+.grafik{width:100%;height:auto;display:block}
+.tablo-kap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;border-bottom:1px solid var(--cizgi);text-align:left;white-space:nowrap}
+
+/* alt sekme çubuğu */
+nav.sekmeler{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-top:1px solid var(--cizgi);
+  padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+nav.sekmeler .ic{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav.sekmeler a{display:grid;justify-items:center;gap:2px;text-decoration:none;color:var(--soluk);font-size:11.5px;font-weight:800;padding:6px 2px;border-radius:12px}
+nav.sekmeler a svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.sekmeler a.on{color:var(--gul-koyu);background:var(--pudra-acik)}
+.senk{font-size:12px;color:var(--soluk);text-align:center;padding:18px 0 4px}
+@media (max-width:420px){.hedef{grid-template-columns:1fr;gap:2px}.durum .buyuk{font-size:21px}}
+</style>
+
+<svg class="gizli-svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="gKurdele" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBE3EA"/><stop offset=".55" stop-color="#EFB3C3"/><stop offset="1" stop-color="#D98AA1"/></linearGradient>
+    <linearGradient id="gCicek" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FCD9E3"/><stop offset="1" stop-color="#EE9DB4"/></linearGradient>
+  </defs>
+  <symbol id="s-kurdele" viewBox="0 0 64 50">
+    <path d="M30 22C20 5 3 6 6 18c2 10 16 10 24 6Z" fill="url(#gKurdele)" stroke="#C4667F" stroke-width="1.3"/>
+    <path d="M34 22C44 5 61 6 58 18c-2 10-16 10-24 6Z" fill="url(#gKurdele)" stroke="#C4667F" stroke-width="1.3"/>
+    <path d="M29 26c-3 8-7 14-12 21l6 1c4-6 7-13 9-21Z" fill="url(#gKurdele)" stroke="#C4667F" stroke-width="1.2"/>
+    <path d="M35 26c3 8 7 14 12 21l-6 1c-4-6-7-13-9-21Z" fill="url(#gKurdele)" stroke="#C4667F" stroke-width="1.2"/>
+    <ellipse cx="32" cy="23" rx="5.2" ry="5.6" fill="#E9A1B4" stroke="#C4667F" stroke-width="1.3"/>
+    <path d="M12 15c3-3 8-2 12 3M52 15c-3-3-8-2-12 3" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="s-kalp" viewBox="0 0 24 24"><path d="M12 20.6s-7.4-4.5-9.4-9C1.2 8.3 3.2 4.8 6.7 4.8c2 0 3.6 1.1 5.3 3.1 1.7-2 3.3-3.1 5.3-3.1 3.5 0 5.5 3.5 4.1 6.8-2 4.5-9.4 9-9.4 9Z" stroke-linejoin="round"/></symbol>
+  <symbol id="s-yildiz" viewBox="0 0 24 24"><path d="M12 2.8l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7Z" fill="#F5C3CF" stroke="#D98AA1" stroke-width="1.1" stroke-linejoin="round"/></symbol>
+  <symbol id="s-cicek" viewBox="-1 -1 26 26"><g fill="url(#gCicek)" stroke="#D98AA1" stroke-width=".8"><circle cx="12" cy="6" r="5"/><circle cx="18" cy="10.4" r="5"/><circle cx="15.7" cy="17.4" r="5"/><circle cx="8.3" cy="17.4" r="5"/><circle cx="6" cy="10.4" r="5"/></g><circle cx="12" cy="12" r="2.8" fill="#F6D98A" stroke="#E3B85A" stroke-width=".8"/></symbol>
+  <symbol id="s-isilti" viewBox="0 0 24 24"><path d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" fill="#F7CBD6"/></symbol>
+</svg>
+
+<div class="kap">
+  <header class="ust">
+    <div>
+      <h1>YKS 2027</h1>
+      <div class="alt" id="altBaslik">ajandam · TYT 19 Haziran, AYT 20 Haziran</div>
+    </div>
+    <svg class="kurdele" aria-hidden="true"><use href="#s-kurdele"/></svg>
+  </header>
+  <main id="gorunum" class="yigin" aria-live="polite"></main>
+  <div class="senk" id="senk">İlerlemen bu cihazda kaydediliyor.</div>
+</div>
+
+<nav class="sekmeler" aria-label="Bölümler">
+  <div class="ic">
+    <a href="#bugun" data-sekme="bugun"><svg viewBox="0 0 24 24"><path d="M12 20.6s-7.4-4.5-9.4-9C1.2 8.3 3.2 4.8 6.7 4.8c2 0 3.6 1.1 5.3 3.1 1.7-2 3.3-3.1 5.3-3.1 3.5 0 5.5 3.5 4.1 6.8-2 4.5-9.4 9-9.4 9Z"/></svg>Bugün</a>
+    <a href="#program" data-sekme="program"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Program</a>
+    <a href="#konular" data-sekme="konular"><svg viewBox="0 0 24 24"><path d="M5 4.5h10.5a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3Z"/><path d="M5 17a3 3 0 0 1 3-3h10.5M9 8.5h6"/></svg>Konular</a>
+    <a href="#kaynak" data-sekme="kaynak"><svg viewBox="0 0 24 24"><path d="M4 5.5h5v14H4zM10.5 5.5h5v14h-5zM17 6.3l3.2-.9 3 13.4-3.2.9"/></svg>Kaynaklar</a>
+    <a href="#deneme" data-sekme="deneme"><svg viewBox="0 0 24 24"><path d="M4 19.5h16M6.5 16l4-5 3 3 4.5-6.5"/></svg>Denemeler</a>
+  </div>
+</nav>
+
+<script src="data.js"></script>
+<script src="core.js"></script>
+<script src="ui.js"></script>
+<script>
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+</script>
+</body></html>
