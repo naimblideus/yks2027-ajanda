@@ -132,7 +132,65 @@
   const BULUT_OK = 'Bulutta kayıtlı · telefonda da aynı liste görünür';
   const senk = m => { durumMetni = m; const el = document.getElementById('senk'); if (el) el.textContent = m; };
   const yerel = () => { try { localStorage.setItem(ANAHTAR, JSON.stringify(S)); } catch (e) { /* yoksay */ } };
-  const kaydet = () => { S.ts = Date.now(); yerel(); degisti(); if (bulut) { clearTimeout(zaman); zaman = setTimeout(gonder, 900); } };
+  let zaman2 = null;
+  const kaydet = () => { S.ts = Date.now(); yerel(); degisti(); if (bulut) { clearTimeout(zaman); zaman = setTimeout(gonder, 900); } else if (kod) { clearTimeout(zaman2); zaman2 = setTimeout(esitle, 1500); } };
+
+  /* ---- cihazlar arası senkron (Claude dışında, PWA): eşleştirme kodu + kayıt sunucusu ---- */
+  const SUNUCU = 'https://yks-kayit.nextusservis.com/v1/kayit/';
+  const KOD_ANAHTAR = 'yks2027-senkron-kod', KOD_DESEN = /^[A-Za-z0-9_-]{20,64}$/;
+  let kod = null, esleGeldi = false, senkMesgul = false, senkBekle = false, sonEsitleme = null;
+  try { kod = localStorage.getItem(KOD_ANAHTAR); } catch (e) { /* yoksay */ }
+  try {
+    const m = location.hash.match(/^#esle=([A-Za-z0-9_-]{20,64})$/);
+    if (m) { kod = m[1]; esleGeldi = true; try { localStorage.setItem(KOD_ANAHTAR, kod); } catch (e) { /* yoksay */ } history.replaceState(null, '', location.pathname); }
+  } catch (e) { /* yoksay */ }
+  const yeniKod = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  const saat = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  async function esitle() {
+    if (!kod || bulut) return;
+    if (senkMesgul) { senkBekle = true; return; }
+    senkMesgul = true;
+    try {
+      const r = await fetch(SUNUCU + kod, { cache: 'no-store' });
+      if (!r.ok && r.status !== 404) throw new Error(String(r.status));
+      const uzak = r.ok ? (await r.json()).veri : null;
+      let yolla = true;
+      if (gecerli(uzak)) {
+        // Zamanı eşit ya da yeni olan sunucuysa onu taban al; her durumda öbür taraftaki daha yeni işaretler korunur.
+        const uzakYeni = (uzak.ts || 0) >= (S.ts || 0);
+        const b = uzakYeni ? birlestir(uzak, S) : birlestir(S, uzak);
+        S = b.s;
+        if (uzakYeni) { yolla = b.degis; if (b.degis) S.ts = Date.now(); }
+        yerel(); degisti();
+      }
+      if (yolla) {
+        const p = await fetch(SUNUCU + kod, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ts: S.ts, veri: S }) });
+        if (p.status === 409) senkBekle = true;
+        else if (!p.ok) throw new Error(String(p.status));
+      }
+      sonEsitleme = saat();
+      senk('Cihazlar eşleşik · son eşitleme ' + sonEsitleme);
+    } catch (e) {
+      senk('Eşitleme şu an olmadı; ilerlemen bu cihazda kayıtlı, internet gelince tekrar denenecek.');
+    }
+    senkMesgul = false;
+    if (senkBekle) { senkBekle = false; setTimeout(esitle, 1500); }
+  }
+  const senkronAc = () => { kod = yeniKod(); try { localStorage.setItem(KOD_ANAHTAR, kod); } catch (e) { /* yoksay */ } esitle(); degisti(); return kod; };
+  const senkronBagla = k => {
+    k = String(k || '').trim().replace(/^.*#esle=/, '');
+    if (!KOD_DESEN.test(k)) return 'Kod hatalı görünüyor. Bağlantının ya da kodun tamamını yapıştır.';
+    kod = k; try { localStorage.setItem(KOD_ANAHTAR, kod); } catch (e) { /* yoksay */ }
+    esitle(); degisti(); return '';
+  };
+  const senkronKapat = () => { kod = null; try { localStorage.removeItem(KOD_ANAHTAR); } catch (e) { /* yoksay */ } senk('İlerlemen bu cihazda kaydediliyor.'); degisti(); };
+  const esleBaglantisi = () => (kod ? location.origin + location.pathname + '#esle=' + kod : '');
+  if (!(window.claude && window.claude.use)) {
+    setTimeout(esitle, 600);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') esitle(); });
+    window.addEventListener('online', () => esitle());
+    setInterval(() => { if (document.visibilityState === 'visible') esitle(); }, 60000);
+  }
   // Daha yeni hâli taban al; öbür taraftaki daha sonra yapılmış işaretleri koru. İki cihaz aynı gün kullanılsa da işaret kaybolmaz.
   const birlestir = (taban, diger) => {
     const s = Object.assign(bos(), kopya(taban)), dd = (diger && diger.dt) || {}, td = s.dt || (s.dt = {});
@@ -296,6 +354,8 @@
     SINAV, DERS, DB, KONU, ADIM, GUNLUK, PLAN, AY, GUN, D, T, ekle, fark, bugun, haftaNo, haftaBas, yaz,
     get S() { return S; }, kaydet, isaretle, dinle: f => dinleyici.push(f), senkMetni: () => durumMetni, bulutVar: () => !!bulut,
     gorevler, hatirlatmalar, gunOrani, istatistik, seri, adimlari, konuDurum, dersOrani, seviyeOrani, videoOrani, videoLink, haftaOzet,
+    senkronVar: () => !!kod, esleGeldi: () => esleGeldi, sonEsitleme: () => sonEsitleme, senkronAc, senkronBagla, senkronKapat, esleBaglantisi, esitle,
+    pwa: () => !(window.claude && window.claude.use),
     etkin, gunAdimlari, yay, yedekMetni, yedektenYukle, geriYukle, oncekiVar, oncekiniGeriAl, yedekAlindi, otoYedekler,
     DURUM_AD: ['Başlamadı', 'Öğreniliyor', 'Öğrenildi', 'Pekişti', 'Ustalaştı'],
     ASAMA_AD: { v: 'Video', o: 'Özet', k: 'Kolay test', r: 'Orta test', z: 'Zor test' }

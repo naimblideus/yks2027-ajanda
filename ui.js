@@ -163,9 +163,10 @@
       : otoListe === false ? '<div class="kucuk">Kopyalar şu an getirilemedi.</div>' : '';
     return `<section class="kart yigin" style="position:relative">${sticker('kalp', 'right:16px;top:-12px;width:28px;height:28px;fill:var(--gul);stroke:var(--gul-koyu);transform:rotate(8deg)')}
       <div><div class="etiket">Kayıt ve yedek</div><h3>Yaptıkların kaybolmaz</h3></div>
-      ${satir('Bulut', bul ? 'Açık · her işaret Claude hesabında saklanıyor' : 'Bu görünümde kapalı · işaretler bu cihazda')}
+      ${Y.pwa() ? satir('Cihaz eşleme', Y.senkronVar() ? 'Açık · telefon ve bilgisayar aynı listeyi görüyor' + (Y.sonEsitleme() ? ' (son eşitleme ' + Y.sonEsitleme() + ')' : '') : 'Kapalı · aşağıdan başlat') : satir('Bulut', bul ? 'Açık · her işaret Claude hesabında saklanıyor' : 'Bu görünümde kapalı · işaretler bu cihazda')}
       ${satir('Bu cihaz', 'Açık · internet gitse de son hâli burada')}
-      ${satir('Haftalık kopya', bul ? 'Her hafta bulutta otomatik bir kopya alınıyor' : 'Bulut kapalıyken alınmıyor')}
+      ${satir('Haftalık kopya', bul || (Y.pwa() && Y.senkronVar()) ? 'Her hafta otomatik bir kopya alınıyor' : 'Eşleme açılınca başlar')}
+      ${Y.pwa() ? esleBolumu() : ''}
       ${satir('Yedek dosyası', (S.sonYedek ? 'Son alınan: ' + esc(Y.yaz(S.sonYedek)) : 'Henüz alınmadı') + ' · 2 haftada bir al, telefonuna ya da Drive\'ına koy')}
       <div class="cipler"><button class="dugme" data-yedek="indir">Yedek dosyasını indir</button><button class="dugme ikincil" data-yedek="kopyala">Yedek kodunu kopyala</button></div>
       ${yCikti ? `<label class="alan">Yedek kodu (hepsini seçip kopyala)<textarea id="yedekCikti" rows="3" readonly>${esc(yCikti)}</textarea></label>` : ''}
@@ -178,6 +179,30 @@
           ${bul ? `<div><button class="dugme ikincil" data-yedek="oto">Haftalık kopyaları göster</button></div>${oto}` : ''}
         </div></details>
     </section>`;
+  }
+  let eMesaj = '', eOnay = false;
+  function esleBolumu() {
+    const ac = Y.senkronVar();
+    const ic = ac
+      ? `<div>Bu bağlantıyı diğer cihazında aç; iki cihaz aynı listeyi görür. Kendine WhatsApp'tan ya da e-postayla gönderebilirsin. <b>Bağlantı kaydının anahtarıdır, kimseyle paylaşma.</b></div>
+        <label class="alan">Eşleme bağlantısı<textarea id="esleLink" rows="2" readonly>${esc(Y.esleBaglantisi())}</textarea></label>
+        <div class="cipler"><button class="dugme" data-esle="kopyala">Bağlantıyı kopyala</button><button class="dugme ikincil" data-esle="simdi">Şimdi eşitle</button><button class="dugme ikincil" data-esle="kapat">${eOnay ? 'Emin misin? Bu cihaz eşlemeden çıkar' : 'Eşlemeyi kapat'}</button></div>`
+      : `<div>Telefonda ve bilgisayarda aynı listeyi görmek için önce bir cihazda eşlemeyi başlat, çıkan bağlantıyı diğer cihazda aç.</div>
+        <div class="cipler"><button class="dugme" data-esle="ac">Bu cihazda eşlemeyi başlat</button></div>
+        <label class="alan">Diğer cihazdan bağlantı ya da kod geldiyse yapıştır<input id="esleKod" placeholder="https://…#esle=… ya da kod" autocomplete="off"></label>
+        <div><button class="dugme ikincil" data-esle="bagla">Eşle</button></div>`;
+    return `<div class="yigin" style="gap:10px;border-top:1px dashed var(--cizgi);padding-top:12px"><div class="etiket">Cihazları eşle</div>${ic}${eMesaj ? `<div class="not">${esc(eMesaj)}</div>` : ''}</div>`;
+  }
+  function esleIslem(tur) {
+    if (tur === 'ac') { Y.senkronAc(); eMesaj = 'Eşleme başladı. Bağlantıyı kopyalayıp diğer cihazında aç.'; return ciz(false); }
+    if (tur === 'bagla') { const v = (document.getElementById('esleKod') || {}).value || ''; const h = Y.senkronBagla(v); eMesaj = h || 'Bu cihaz eşlendi. Listen birkaç saniye içinde diğer cihazdakiyle birleşecek.'; return ciz(false); }
+    if (tur === 'simdi') { Y.esitle().then(() => ciz(false)); return; }
+    if (tur === 'kapat') { if (!eOnay) { eOnay = true; return ciz(false); } eOnay = false; Y.senkronKapat(); eMesaj = 'Bu cihaz eşlemeden çıktı. İşaretlerin bu cihazda duruyor.'; return ciz(false); }
+    if (tur === 'kopyala') {
+      const link = Y.esleBaglantisi();
+      const elle = () => { eMesaj = 'Otomatik kopyalanamadı; kutudaki bağlantının hepsini seçip kopyala.'; ciz(false); const t = document.getElementById('esleLink'); if (t) { t.focus(); t.select(); } };
+      try { navigator.clipboard.writeText(link).then(() => { eMesaj = 'Bağlantı kopyalandı. Diğer cihazında aç.'; ciz(false); }, elle); } catch (e) { elle(); }
+    }
   }
   async function yedekIslem(tur) {
     if (tur === 'kopyala') {
@@ -281,7 +306,7 @@
   window.addEventListener('hashchange', () => { const x = location.hash.slice(1); if (SEKMELER.includes(x) && x !== sekme) { sekme = x; ciz(true); } });
 
   document.addEventListener('click', e => {
-    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto]');
+    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle]');
     if (!b) return;
     const ds = b.dataset;
     if (ds.t) return Y.isaretle(ds.t);
@@ -292,6 +317,7 @@
     if (ds.dtur) { dTur = ds.dtur; return ciz(false); }
     if (ds.yay) { const gs = +ds.yay, n = Y.yay(gs); bilgi = n ? n + ' görev önündeki ' + (gs / 7) + ' haftaya yayıldı. Bu günlerde listen biraz daha dolu olacak.' : ''; return ciz(false); }
     if (ds.yedek) { yedekIslem(ds.yedek); return; }
+    if (ds.esle) { esleIslem(ds.esle); return; }
     if (ds.oto) {
       if (yOnay !== ds.oto) { yOnay = ds.oto; return ciz(false); }
       const o = (Array.isArray(otoListe) ? otoListe : []).find(x => x.id === ds.oto); yOnay = null;
@@ -324,6 +350,7 @@
     Y.kaydet();
   });
 
+  if (Y.esleGeldi && Y.esleGeldi()) bilgi = 'Bu cihaz eşlendi. Listen diğer cihazındakiyle birleşiyor; Kaynaklar sekmesinden durumu görebilirsin.';
   ciz(true);
   let sonGun = Y.bugun();
   setInterval(() => { if (Y.bugun() !== sonGun) { sonGun = Y.bugun(); ciz(false); } }, 60000);
