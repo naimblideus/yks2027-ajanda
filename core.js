@@ -168,9 +168,10 @@
         if (p.status === 409) senkBekle = true;
         else if (!p.ok) throw new Error(String(p.status));
       }
-      sonEsitleme = saat();
+      sonEsitleme = saat(); sonSonuc = true;
       senk('Cihazlar eşleşik · son eşitleme ' + sonEsitleme);
     } catch (e) {
+      sonSonuc = false;
       senk('Eşitleme şu an olmadı; ilerlemen bu cihazda kayıtlı, internet gelince tekrar denenecek.');
     }
     senkMesgul = false;
@@ -185,6 +186,18 @@
   };
   const senkronKapat = () => { kod = null; try { localStorage.removeItem(KOD_ANAHTAR); } catch (e) { /* yoksay */ } senk('İlerlemen bu cihazda kaydediliyor.'); degisti(); };
   const esleBaglantisi = () => (kod ? location.origin + location.pathname + '#esle=' + kod : '');
+  // Ana adres: uygulama artık sunucunun kendisinden açılıyor. Eski GitHub adresi kaydı sunucuya yollayıp oraya taşır.
+  const ANA_ADRES = 'https://yks-kayit.nextusservis.com/';
+  let sonSonuc = false;
+  const eskiAdres = () => location.hostname === 'naimblideus.github.io';
+  async function yeniAdreseGec() {
+    if (!kod) { kod = yeniKod(); try { localStorage.setItem(KOD_ANAHTAR, kod); } catch (e) { /* yoksay */ } }
+    sonSonuc = false;
+    await esitle();
+    if (!sonSonuc) return 'Şu an sunucuya ulaşılamadı. İnternetini kontrol edip tekrar dene; işaretlerin bu cihazda duruyor.';
+    location.href = ANA_ADRES + '#esle=' + kod;
+    return '';
+  }
   if (!(window.claude && window.claude.use)) {
     setTimeout(esitle, 600);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') esitle(); });
@@ -355,7 +368,7 @@
     get S() { return S; }, kaydet, isaretle, dinle: f => dinleyici.push(f), senkMetni: () => durumMetni, bulutVar: () => !!bulut,
     gorevler, hatirlatmalar, gunOrani, istatistik, seri, adimlari, konuDurum, dersOrani, seviyeOrani, videoOrani, videoLink, haftaOzet,
     senkronVar: () => !!kod, esleGeldi: () => esleGeldi, sonEsitleme: () => sonEsitleme, senkronAc, senkronBagla, senkronKapat, esleBaglantisi, esitle,
-    pwa: () => !(window.claude && window.claude.use),
+    pwa: () => !(window.claude && window.claude.use), eskiAdres, yeniAdreseGec, ANA_ADRES,
     etkin, gunAdimlari, yay, yedekMetni, yedektenYukle, geriYukle, oncekiVar, oncekiniGeriAl, yedekAlindi, otoYedekler,
     DURUM_AD: ['Başlamadı', 'Öğreniliyor', 'Öğrenildi', 'Pekişti', 'Ustalaştı'],
     ASAMA_AD: { v: 'Video', o: 'Özet', k: 'Kolay test', r: 'Orta test', z: 'Zor test' }

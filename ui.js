@@ -48,6 +48,7 @@
       <div class="cipler"><span class="cip dolu">TYT'ye <b>${Math.max(0, Y.fark(bg, Y.SINAV.tyt))}</b> gün</span><span class="cip">Konuların bitişine <b>${Math.max(0, Y.fark(bg, Y.SINAV.konuBitis))}</b> gün</span><span class="cip">${esc(faz)}</span></div>
       <div class="durum">${halka(st.bitti / st.toplam)}<div><div class="buyuk${st.geri ? ' geri' : ''}">${baslik}</div><div class="kucuk">${esc(alt)}</div></div></div></section>`;
 
+    if (Y.eskiAdres && Y.eskiAdres()) h = `<section class="kart yigin" style="border-color:var(--gul-koyu)"><div class="etiket">Yeni adres</div><h3>Ajandan yks-kayit.nextusservis.com adresine taşındı</h3><div>Düğmeye bas: işaretlerin önce kaydedilir, sonra yeni adres eşlenmiş olarak açılır. Telefona ana ekrana eklediysen yeni adresten tekrar ekle.</div><div><button class="dugme" data-tasi="1">Yeni adrese geç</button></div>${tasiMesaj ? `<div class="not">${esc(tasiMesaj)}</div>` : ''}</section>` + h;
     if (g === bg) {
       const gl = Object.values(Y.ADIM).filter(a => Y.etkin(a) < bg && !Y.S.done[a.id]).sort((x, y) => (Y.etkin(x) < Y.etkin(y) ? -1 : Y.etkin(x) > Y.etkin(y) ? 1 : KI.get(x.t) - KI.get(y.t)));
       if (gl.length) h += `<section class="kart yigin">${grup('', 'Önce bunlar · ' + gl.length + ' geride kalan', gl.slice(0, acik.geri ? 80 : 5).map(a => gorevSatiri(a, true)).join(''))}${gl.length > 5 ? `<div><button class="dugme ikincil" data-ac="geri">${acik.geri ? 'Daha az göster' : 'Hepsini göster (' + gl.length + ')'}</button></div>` : ''}${gl.length >= 4 ? `<div class="cipler"><button class="dugme ikincil" data-yay="7">1 haftaya yay</button><button class="dugme ikincil" data-yay="14">2 haftaya yay</button></div><div class="kucuk">Geride kalanları önündeki günlere eşit dağıtır; programın geri kalanı değişmez.</div>` : ''}</section>`;
@@ -180,7 +181,7 @@
         </div></details>
     </section>`;
   }
-  let eMesaj = '', eOnay = false;
+  let eMesaj = '', eOnay = false, tasiMesaj = '';
   function esleBolumu() {
     const ac = Y.senkronVar();
     const ic = ac
@@ -306,7 +307,7 @@
   window.addEventListener('hashchange', () => { const x = location.hash.slice(1); if (SEKMELER.includes(x) && x !== sekme) { sekme = x; ciz(true); } });
 
   document.addEventListener('click', e => {
-    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle]');
+    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle],[data-tasi]');
     if (!b) return;
     const ds = b.dataset;
     if (ds.t) return Y.isaretle(ds.t);
@@ -318,6 +319,7 @@
     if (ds.yay) { const gs = +ds.yay, n = Y.yay(gs); bilgi = n ? n + ' görev önündeki ' + (gs / 7) + ' haftaya yayıldı. Bu günlerde listen biraz daha dolu olacak.' : ''; return ciz(false); }
     if (ds.yedek) { yedekIslem(ds.yedek); return; }
     if (ds.esle) { esleIslem(ds.esle); return; }
+    if (ds.tasi) { tasiMesaj = 'Kaydediliyor…'; ciz(false); Y.yeniAdreseGec().then(h => { tasiMesaj = h; ciz(false); }); return; }
     if (ds.oto) {
       if (yOnay !== ds.oto) { yOnay = ds.oto; return ciz(false); }
       const o = (Array.isArray(otoListe) ? otoListe : []).find(x => x.id === ds.oto); yOnay = null;
