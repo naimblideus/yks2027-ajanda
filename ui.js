@@ -26,11 +26,12 @@
     else if (a.tur === 'o') alt = d.ad + ' · özet defterine kendi cümlelerinle';
     else alt = d.ad + ' · ' + kitapAd(d, a.tur);
     if (tarihli) alt += ' · ' + Y.yaz(Y.etkin(a));
-    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(a.id, on, ad + ', ' + Y.ASAMA_AD[a.tur])}<div class="ad"><span class="asama">${Y.ASAMA_AD[a.tur]}</span>${esc(ad)}<small>${esc(alt)}</small></div>${link}</div>`;
+    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(a.id, on, ad + ', ' + Y.ASAMA_AD[a.tur])}<div class="ad"><span class="asama">${Y.ASAMA_AD[a.tur]}</span>${esc(ad)}<small>${esc(alt)}</small></div>${duzenle ? kaldirDug(a.id, ad) : link}</div>`;
   }
-  function ekSatir(g) {
+  const kaldirDug = (id, ad) => `<button class="izle" data-gizle="${esc(id)}" aria-label="${esc(ad)} görevini kaldır">Kaldır</button>`;
+  function ekSatir(g, kaldirilir) {
     const on = !!Y.S.done[g.id];
-    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(g.id, on, g.ad)}<div class="ad">${esc(g.ad)}${g.alt ? `<small>${esc(g.alt)}</small>` : ''}</div>${g.ara ? izle(ara(g.ara)) : ''}</div>`;
+    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(g.id, on, g.ad)}<div class="ad">${esc(g.ad)}${g.alt ? `<small>${esc(g.alt)}</small>` : ''}</div>${duzenle && kaldirilir ? kaldirDug(g.id, g.ad) : g.ara ? izle(ara(g.ara)) : ''}</div>`;
   }
   const grup = (sinif, baslik, ic) => `<div><div class="grup-baslik"><span class="nokta ${sinif}"></span><span class="etiket">${baslik}</span></div>${ic}</div>`;
   const halka = o => {
@@ -50,7 +51,7 @@
 
     if (Y.eskiAdres && Y.eskiAdres()) h = `<section class="kart yigin" style="border-color:var(--gul-koyu)"><div class="etiket">Yeni adres</div><h3>Ajandan yks-kayit.nextusservis.com adresine taşındı</h3><div>Düğmeye bas: işaretlerin önce kaydedilir, sonra yeni adres eşlenmiş olarak açılır. Telefona ana ekrana eklediysen yeni adresten tekrar ekle.</div><div><button class="dugme" data-tasi="1">Yeni adrese geç</button></div>${tasiMesaj ? `<div class="not">${esc(tasiMesaj)}</div>` : ''}</section>` + h;
     if (g === bg) {
-      const gl = Object.values(Y.ADIM).filter(a => Y.etkin(a) < bg && !Y.S.done[a.id]).sort((x, y) => (Y.etkin(x) < Y.etkin(y) ? -1 : Y.etkin(x) > Y.etkin(y) ? 1 : KI.get(x.t) - KI.get(y.t)));
+      const gl = Object.values(Y.ADIM).filter(a => Y.etkin(a) < bg && !Y.S.done[a.id] && !Y.gizliMi(a.id)).sort((x, y) => (Y.etkin(x) < Y.etkin(y) ? -1 : Y.etkin(x) > Y.etkin(y) ? 1 : KI.get(x.t) - KI.get(y.t)));
       if (gl.length) h += `<section class="kart yigin">${grup('', 'Önce bunlar · ' + gl.length + ' geride kalan', gl.slice(0, acik.geri ? 80 : 5).map(a => gorevSatiri(a, true)).join(''))}${gl.length > 5 ? `<div><button class="dugme ikincil" data-ac="geri">${acik.geri ? 'Daha az göster' : 'Hepsini göster (' + gl.length + ')'}</button></div>` : ''}${gl.length >= 4 ? `<div class="cipler"><button class="dugme ikincil" data-yay="7">1 haftaya yay</button><button class="dugme ikincil" data-yay="14">2 haftaya yay</button></div><div class="kucuk">Geride kalanları önündeki günlere eşit dağıtır; programın geri kalanı değişmez.</div>` : ''}</section>`;
       if (bilgi) h += `<div class="not">${esc(bilgi)}</div>`;
     }
@@ -74,10 +75,19 @@
     h += `<section class="kart yigin">
       <div class="gezgin"><button data-gun="-1">‹ Önceki</button><div class="gun">${g === bg ? 'Bugün' : esc(Y.GUN[Y.D(g).getDay()])}<div class="kucuk" style="font-family:var(--f-govde);margin-top:8px">${esc(Y.yaz(g, true))}</div></div><button data-gun="1">Sonraki ›</button></div>
       ${g !== bg ? '<div style="text-align:center"><button class="dugme ikincil" data-gun="0">Bugüne dön</button></div>' : ''}
-      ${hat.length ? grup('n-gun', 'Hatırlatma', hat.map(ekSatir).join('')) : ''}
-      ${ozel.length ? grup('n-gun', 'Günün özel görevi', ozel.map(ekSatir).join('')) : ''}
+      ${hat.length ? grup('n-gun', 'Hatırlatma', hat.map(x => ekSatir(x, false)).join('')) : ''}
+      ${ozel.length ? grup('n-gun', 'Günün özel görevi', ozel.map(x => ekSatir(x, true)).join('')) : ''}
       ${liste}${bosNot}
-      ${her.length ? grup('n-gun', 'Her gün', her.map(ekSatir).join('')) : ''}
+      ${grup('n-geo', 'Benim görevlerim', Y.ozelGun(g).map(o => {
+        const on = !!Y.S.done[o.id];
+        const sil = ozelSilBekle === o.id
+          ? (o.tekrar ? `<span class="cipler"><button class="izle" data-osil-gun="${esc(o.id)}">Bu günü</button><button class="izle" data-osil-hep="${esc(o.seri)}">Hepsini</button></span>` : `<button class="izle" data-osil-hep="${esc(o.seri)}">Emin misin?</button>`)
+          : `<button class="izle" data-osil="${esc(o.id)}" aria-label="${esc(o.ad)} görevini sil">Sil</button>`;
+        return `<div class="gorev${on ? ' bitti' : ''}">${kalp(o.id, on, o.ad)}<div class="ad">${esc(o.ad)}${o.tekrar ? `<small>${Y.TEKRAR_AD[o.tekrar]}</small>` : ''}</div>${sil}</div>`;
+      }).join('') + `<form id="ozelForm" class="yigin" style="gap:8px;padding-top:8px"><input id="ozelAd" maxlength="140" placeholder="+ Görev ekle (ör. kitapçıya git)" autocomplete="off" aria-label="Yeni görev"><div class="cipler" style="align-items:center"><select id="ozelTekrar" aria-label="Tekrar" style="width:auto"><option value="">Bir kez (${esc(Y.yaz(g))})</option><option value="gun">Her gün</option><option value="hafta">Her hafta ${esc(Y.GUN[Y.D(g).getDay()])}</option></select><button class="dugme" type="submit">Ekle</button></div></form>`)}
+      ${(() => { const gz = Y.gunGizlenen(g); return gz.length ? `<div class="kucuk">Bu günden kaldırdıkların: ${gz.length} · <button class="izle" data-geri="${esc(g)}">Geri getir</button></div>` : ''; })()}
+      <div><button class="dugme ikincil" data-duzenle="1">${duzenle ? 'Düzenlemeyi bitir' : 'Düzenle: programın görevlerini kaldır'}</button></div>
+      ${her.length ? grup('n-gun', 'Her gün', her.map(x => ekSatir(x, true)).join('')) : ''}
     </section>
     <section class="kart yigin"><div class="etiket">Bir konu nasıl biter?</div>
       <div>Video, özet ve kolay test <b>aynı gün</b>. Orta test 2 gün sonra, zor test 1 hafta sonra listene kendiliğinden gelir. Videoları 1,25x hızda izle; özeti videoya bakmadan, kendi cümlelerinle yaz.</div>
@@ -181,7 +191,7 @@
         </div></details>
     </section>`;
   }
-  let eMesaj = '', eOnay = false, tasiMesaj = '';
+  let eMesaj = '', eOnay = false, tasiMesaj = '', ozelSilBekle = null, duzenle = false;
   function esleBolumu() {
     const ac = Y.senkronVar();
     const ic = ac
@@ -307,7 +317,7 @@
   window.addEventListener('hashchange', () => { const x = location.hash.slice(1); if (SEKMELER.includes(x) && x !== sekme) { sekme = x; ciz(true); } });
 
   document.addEventListener('click', e => {
-    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle],[data-tasi]');
+    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle],[data-tasi],[data-osil],[data-osil-gun],[data-osil-hep],[data-gizle],[data-geri],[data-duzenle]');
     if (!b) return;
     const ds = b.dataset;
     if (ds.t) return Y.isaretle(ds.t);
@@ -319,6 +329,12 @@
     if (ds.yay) { const gs = +ds.yay, n = Y.yay(gs); bilgi = n ? n + ' görev önündeki ' + (gs / 7) + ' haftaya yayıldı. Bu günlerde listen biraz daha dolu olacak.' : ''; return ciz(false); }
     if (ds.yedek) { yedekIslem(ds.yedek); return; }
     if (ds.esle) { esleIslem(ds.esle); return; }
+    if (ds.osil) { ozelSilBekle = ds.osil; return ciz(false); }
+    if (ds.osilGun) { ozelSilBekle = null; return Y.gizle(ds.osilGun, true); }
+    if (ds.osilHep) { ozelSilBekle = null; return Y.ozelSil(ds.osilHep); }
+    if (ds.gizle) return Y.gizle(ds.gizle, true);
+    if (ds.geri) { const l = Y.gunGizlenen(ds.geri); l.forEach(id => { Y.S.gizli[id] = { v: false, t: Date.now() }; }); return Y.kaydet(); }
+    if (ds.duzenle) { duzenle = !duzenle; return ciz(false); }
     if (ds.tasi) { tasiMesaj = 'Kaydediliyor…'; ciz(false); Y.yeniAdreseGec().then(h => { tasiMesaj = h; ciz(false); }); return; }
     if (ds.oto) {
       if (yOnay !== ds.oto) { yOnay = ds.oto; return ciz(false); }
@@ -344,6 +360,12 @@
     else if (ds.kanal) { const k = Y.S.kanal[ds.kanal] = Y.S.kanal[ds.kanal] || {}; k[ds.alan] = el.value.trim().slice(0, 300); Y.kaydet(); }
   });
   document.addEventListener('submit', e => {
+    if (e.target.id === 'ozelForm') {
+      e.preventDefault();
+      const ad = $('#ozelAd').value;
+      if (Y.ozelEkle(secGun || Y.bugun(), ad, ($('#ozelTekrar') || {}).value)) { const i = $('#ozelAd'); if (i) i.focus(); }
+      return;
+    }
     if (e.target.id !== 'dForm') return;
     e.preventDefault();
     const n = DTUR[dTur].map((x, i) => { const v = parseFloat(String($('#dn-' + dTur + '-' + i).value).replace(',', '.')); return isNaN(v) ? 0 : Math.max(-x[1] / 4, Math.min(x[1], v)); });
