@@ -80,9 +80,9 @@
       if (son) ekleG('son', son[0], son[1], gd === 6 || gd === 0 ? 'deneme' : 'gun');
       return g;
     }
-    const par = w <= 12 ? 20 : w <= 23 ? 15 : 20;
+    const ay = S.ayar || {}, par = ay.par || (w <= 12 ? 20 : w <= 23 ? 15 : 20), mt = ay.mat || 10;
     ekleG('par', 'Paragraf · ' + par + ' soru', 'Her gün, süre tutarak');
-    if (gd !== 0) ekleG('mat', w <= 12 ? 'Matematik tekrar · eski konulardan 10 soru' : 'TYT problem · 10 soru', 'Unutmamak için kısa tekrar');
+    if (gd !== 0) ekleG('mat', w <= 12 ? 'Matematik tekrar · eski konulardan ' + mt + ' soru' : 'TYT problem · ' + mt + ' soru', 'Unutmamak için kısa tekrar');
     if (w >= 24) {
       const dg = {
         1: ['Pekiştirme · bekleyen testlerden 3 tane', 'Konular sekmesinde yarım kalanlar'],
@@ -122,7 +122,7 @@
 
   /* ---- durum ve kayıt: bulut + bu cihaz + haftalık kopya + yedek dosyası ---- */
   const ANAHTAR = 'yks2027-ajandam-v1', ONCEKI = 'yks2027-ajandam-onceki';
-  const bos = () => ({ v: 1, ts: 0, done: {}, dt: {}, kitap: {}, kanal: {}, den: [], yeni: {}, ozel: {}, gizli: {}, sonYedek: null, sonOto: null, epoch: 0 });
+  const bos = () => ({ v: 1, ts: 0, done: {}, dt: {}, kitap: {}, kanal: {}, den: [], yeni: {}, tasi: {}, ozel: {}, gizli: {}, ayar: {}, sonYedek: null, sonOto: null, epoch: 0 });
   const kopya = o => JSON.parse(JSON.stringify(o));
   const gecerli = v => !!v && v.v === 1 && typeof v.done === 'object' && v.done !== null;
   let S = bos();
@@ -217,13 +217,15 @@
       }
     }
     // Kendi eklediğin görevler: her görev ayrı birleşir, iki cihazda eklenenlerin hiçbiri kaybolmaz.
-    ['ozel', 'gizli'].forEach(alan => {
+    ['ozel', 'gizli', 'tasi'].forEach(alan => {
       const ob = (diger && diger[alan]) || {}, so = s[alan] || (s[alan] = {});
       for (const id in ob) {
         const t = (ob[id] && ob[id].t) || 0;
         if (t > ((so[id] && so[id].t) || 0) && t > (s.epoch || 0)) { so[id] = ob[id]; degis = true; }
       }
     });
+    const da = (diger && diger.ayar) || {};
+    if ((da.t || 0) > ((s.ayar && s.ayar.t) || 0) && (da.t || 0) > (s.epoch || 0)) { s.ayar = da; degis = true; }
     return { s, degis };
   };
   async function gonder() {
@@ -280,17 +282,21 @@
   };
 
   /* ---- geride kalanları yay ---- */
-  const etkin = a => (S.yeni && S.yeni[a.id]) || a.tarih;
+  // Bir adımın günü: elle taşındıysa (S.tasi) o gün, eski "yay" kaydı (S.yeni) varsa o, yoksa programdaki gün.
+  const etkin = a => (S.tasi && S.tasi[a.id] && S.tasi[a.id].g) || (S.yeni && S.yeni[a.id]) || a.tarih;
   const gunAdimlari = g => {
-    const y = S.yeni || {}, ek = [];
-    for (const id in y) if (y[id] === g && ADIM[id]) ek.push(id);
-    return (GUNLUK[g] || []).filter(id => !y[id]).concat(ek).filter(id => !gizliMi(id));
+    const ek = [], gor = {};
+    [S.yeni || {}, S.tasi || {}].forEach(m => { for (const id in m) if (!gor[id] && ADIM[id]) { gor[id] = 1; if (etkin(ADIM[id]) === g && ADIM[id].tarih !== g) ek.push(id); } });
+    return (GUNLUK[g] || []).filter(id => etkin(ADIM[id]) === g).concat(ek).filter(id => !gizliMi(id));
   };
+  const tarihGecerli = g => /^\d{4}-\d{2}-\d{2}$/.test(g) && g >= '2026-11-01' && g <= SINAV.ayt;
+  const tasi = (id, g) => { if (!ADIM[id] || !tarihGecerli(g)) return false; (S.tasi = S.tasi || {})[id] = { g, t: Date.now() }; kaydet(); return true; };
   const yay = gunSay => {
     const bg = bugun(), geri = TUM.filter(a => etkin(a) < bg && !S.done[a.id] && !gizliMi(a.id)).sort((x, y) => (etkin(x) < etkin(y) ? -1 : etkin(x) > etkin(y) ? 1 : 0));
     if (!geri.length) return 0;
-    S.yeni = S.yeni || {};
-    geri.forEach((a, i) => { S.yeni[a.id] = ekle(bg, Math.floor(i * gunSay / geri.length)); });
+    S.tasi = S.tasi || {};
+    const t = Date.now();
+    geri.forEach((a, i) => { S.tasi[a.id] = { g: ekle(bg, Math.floor(i * gunSay / geri.length)), t }; });
     kaydet();
     return geri.length;
   };
@@ -330,9 +336,10 @@
   /* ---- kendi görevlerin ---- */
   // tekrar: '' bir kez · 'gun' her gün · 'hafta' her hafta aynı gün. Tekrarlı görevin her günü ayrı işaretlenir (id@tarih).
   const TEKRAR_AD = { '': '', gun: 'her gün', hafta: 'her hafta' };
-  const ozelGun = g => Object.entries(S.ozel || {}).filter(([, o]) => o && !o.sil && (
+  const ozelGunHam = g => Object.entries(S.ozel || {}).filter(([, o]) => o && !o.sil && (
     (!o.tekrar && o.g === g) || (o.tekrar === 'gun' && g >= o.g) || (o.tekrar === 'hafta' && g >= o.g && fark(o.g, g) % 7 === 0)
-  )).map(([id, o]) => ({ id: o.tekrar ? id + '@' + g : id, seri: id, ad: o.ad, tekrar: o.tekrar || '', t: o.t })).filter(x => !gizliMi(x.id)).sort((a, b) => a.t - b.t);
+  )).map(([id, o]) => ({ id: o.tekrar ? id + '@' + g : id, seri: id, ad: o.ad, tekrar: o.tekrar || '', t: o.t })).sort((a, b) => a.t - b.t);
+  const ozelGun = g => ozelGunHam(g).filter(x => !gizliMi(x.id));
   const ozelEkle = (g, ad, tekrar) => {
     ad = String(ad || '').trim().slice(0, 140);
     if (!ad || !/^\d{4}-\d{2}-\d{2}$/.test(g)) return false;
@@ -341,10 +348,38 @@
     kaydet(); return true;
   };
   // Programın görevlerini (ya da tekrarlı görevin tek bir gününü) gizle / geri getir
-  const gizliMi = id => !!(S.gizli && S.gizli[id] && S.gizli[id].v);
+  // "seri:par" gibi bir kayıt o sabit görevi her günden kaldırır (paragraf, matematik tekrarı…).
+  const seriAdi = id => { const m = /^g-\d{4}-\d{2}-\d{2}-([a-z]+)$/.exec(id); return m ? 'seri:' + m[1] : ''; };
+  const gizliMi = id => {
+    const z = S.gizli || {};
+    if (z[id] && z[id].v) return true;
+    const s = seriAdi(id);
+    return !!(s && z[s] && z[s].v);
+  };
   const gizle = (id, v) => { (S.gizli = S.gizli || {})[id] = { v: !!v, t: Date.now() }; kaydet(); };
-  const gunGizlenen = g => (GUNLUK[g] || []).concat(gorevlerHam(g).map(x => x.id)).filter(gizliMi);
+  const herGundenKaldir = id => { const s = seriAdi(id); if (s) gizle(s, true); };
+  const gunGizlenen = g => [...new Set((GUNLUK[g] || []).concat(Object.keys(S.tasi || {}), Object.keys(S.yeni || {}), gorevlerHam(g).map(x => x.id), ozelGunHam(g).map(x => x.id)))].filter(id => !ADIM[id] || etkin(ADIM[id]) === g).filter(gizliMi);
+  const geriGetir = g => {
+    const t = Date.now(), z = S.gizli = S.gizli || {};
+    gunGizlenen(g).forEach(id => { if (z[id] && z[id].v) z[id] = { v: false, t }; const s = seriAdi(id); if (s && z[s] && z[s].v) z[s] = { v: false, t }; });
+    kaydet();
+  };
   const ozelSil = id => { const o = S.ozel && S.ozel[id]; if (!o) return; S.ozel[id] = { g: o.g, ad: o.ad, sil: true, t: Date.now() }; kaydet(); };
+  const ozelDuzelt = (id, ad) => {
+    const o = S.ozel && S.ozel[id]; ad = String(ad || '').trim().slice(0, 140);
+    if (!o || o.sil || !ad) return false;
+    S.ozel[id] = Object.assign({}, o, { ad, t: Date.now() }); kaydet(); return true;
+  };
+  const ozelTasi = (id, g) => {
+    const o = S.ozel && S.ozel[id];
+    if (!o || o.sil || o.tekrar || !tarihGecerli(g)) return false;
+    S.ozel[id] = Object.assign({}, o, { g, t: Date.now() }); kaydet(); return true;
+  };
+  // Günlük paragraf ve matematik tekrarı soru sayısı (boş = programın önerdiği)
+  const ayarla = (par, mat) => {
+    const n = v => { v = parseInt(v, 10); return v >= 1 && v <= 200 ? v : 0; };
+    S.ayar = { par: n(par), mat: n(mat), t: Date.now() }; kaydet();
+  };
 
   /* ---- hesaplar ---- */
   const gunOrani = g => {
@@ -396,7 +431,7 @@
     get S() { return S; }, kaydet, isaretle, dinle: f => dinleyici.push(f), senkMetni: () => durumMetni, bulutVar: () => !!bulut,
     gorevler, hatirlatmalar, gunOrani, istatistik, seri, adimlari, konuDurum, dersOrani, seviyeOrani, videoOrani, videoLink, haftaOzet,
     senkronVar: () => !!kod, esleGeldi: () => esleGeldi, sonEsitleme: () => sonEsitleme, senkronAc, senkronBagla, senkronKapat, esleBaglantisi, esitle,
-    ozelGun, ozelEkle, ozelSil, TEKRAR_AD, gizliMi, gizle, gunGizlenen,
+    ozelGun, ozelEkle, ozelSil, ozelDuzelt, ozelTasi, tasi, ayarla, herGundenKaldir, geriGetir, TEKRAR_AD, gizliMi, gizle, gunGizlenen,
     pwa: () => !(window.claude && window.claude.use), eskiAdres, yeniAdreseGec, ANA_ADRES,
     etkin, gunAdimlari, yay, yedekMetni, yedektenYukle, geriYukle, oncekiVar, oncekiniGeriAl, yedekAlindi, otoYedekler,
     DURUM_AD: ['Başlamadı', 'Öğreniliyor', 'Öğrenildi', 'Pekişti', 'Ustalaştı'],

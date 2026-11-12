@@ -26,17 +26,31 @@
     else if (a.tur === 'o') alt = d.ad + ' · özet defterine kendi cümlelerinle';
     else alt = d.ad + ' · ' + kitapAd(d, a.tur);
     if (tarihli) alt += ' · ' + Y.yaz(Y.etkin(a));
-    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(a.id, on, ad + ', ' + Y.ASAMA_AD[a.tur])}<div class="ad"><span class="asama">${Y.ASAMA_AD[a.tur]}</span>${esc(ad)}<small>${esc(alt)}</small></div>${duzenle ? kaldirDug(a.id, ad) : link}</div>`;
+    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(a.id, on, ad + ', ' + Y.ASAMA_AD[a.tur])}<div class="ad"><span class="asama">${Y.ASAMA_AD[a.tur]}</span>${esc(ad)}<small>${esc(alt)}</small></div>${duzenle ? `<span class="islem"><button class="izle" data-tas="a:${esc(a.id)}" aria-label="${esc(ad)} görevini başka güne taşı">Taşı</button>${kaldirDug(a.id, ad)}</span>` : link}</div>${tasFormu('a:' + a.id, Y.etkin(a))}`;
   }
   const kaldirDug = (id, ad) => `<button class="izle" data-gizle="${esc(id)}" aria-label="${esc(ad)} görevini kaldır">Kaldır</button>`;
-  function ekSatir(g, kaldirilir) {
+  // Taşı: ertesi güne ya da seçilen güne
+  const tasFormu = (anahtar, g) => {
+    if (tasAcik !== anahtar) return '';
+    const bg = Y.bugun(), gecmis = g < bg, hizli = gecmis ? bg : Y.ekle(g, 1);
+    return `<div class="satir-form"><span class="kucuk">Hangi güne?</span><button class="izle" data-tasgun="${esc(hizli)}">${gecmis ? 'Bugüne' : 'Ertesi güne'}</button><input type="date" id="tasTarih" value="${esc(gecmis ? Y.ekle(bg, 1) : hizli)}" min="2026-11-01" max="${esc(Y.SINAV.ayt)}" aria-label="Taşınacak gün"><button class="dugme" data-tasok="1">Taşı</button><button class="dugme ikincil" data-iptal="1">Vazgeç</button></div>`;
+  };
+  function ekSatir(g, kaldirilir, herGun) {
     const on = !!Y.S.done[g.id];
-    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(g.id, on, g.ad)}<div class="ad">${esc(g.ad)}${g.alt ? `<small>${esc(g.alt)}</small>` : ''}</div>${duzenle && kaldirilir ? kaldirDug(g.id, g.ad) : g.ara ? izle(ara(g.ara)) : ''}</div>`;
+    const dug = herGun ? `<span class="islem"><button class="izle" data-gizle="${esc(g.id)}" aria-label="${esc(g.ad)} görevini bugünden kaldır">Bugünden</button><button class="izle" data-hergun="${esc(g.id)}" aria-label="${esc(g.ad)} görevini her günden kaldır">Her günden</button></span>` : kaldirDug(g.id, g.ad);
+    return `<div class="gorev${on ? ' bitti' : ''}">${kalp(g.id, on, g.ad)}<div class="ad">${esc(g.ad)}${g.alt ? `<small>${esc(g.alt)}</small>` : ''}</div>${duzenle && kaldirilir ? dug : g.ara ? izle(ara(g.ara)) : ''}</div>`;
   }
   const grup = (sinif, baslik, ic) => `<div><div class="grup-baslik"><span class="nokta ${sinif}"></span><span class="etiket">${baslik}</span></div>${ic}</div>`;
   const halka = o => {
     const r = 30, c = 2 * Math.PI * r;
     return `<svg class="halka" viewBox="0 0 74 74" aria-hidden="true"><circle cx="37" cy="37" r="${r}" fill="none" stroke="var(--pudra)" stroke-width="8"/><circle cx="37" cy="37" r="${r}" fill="none" stroke="var(--gul-koyu)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - o)).toFixed(1)}" transform="rotate(-90 37 37)"/><text x="37" y="42" text-anchor="middle" font-size="15" font-weight="800" fill="var(--murekkep)" font-family="Nunito, sans-serif">%${Math.round(o * 100)}</text></svg>`;
+  };
+
+  const ayarFormu = () => {
+    const a = Y.S.ayar || {};
+    return `<form id="ayarForm" class="yigin" style="gap:8px;border-top:1px dashed var(--cizgi);padding-top:12px"><div class="etiket">Günlük soru sayıları</div>
+      <div class="izgara"><label class="alan">Paragraf (her gün)<input id="ayarPar" type="number" min="1" max="200" inputmode="numeric" value="${esc(a.par || '')}" placeholder="Program: 20, AYT döneminde 15"></label><label class="alan">Matematik tekrar (Pazar hariç)<input id="ayarMat" type="number" min="1" max="200" inputmode="numeric" value="${esc(a.mat || '')}" placeholder="Program: 10"></label></div>
+      <div class="cipler" style="align-items:center"><button class="dugme" type="submit">Kaydet</button><span class="kucuk">Boş bırakırsan programın sayısı kullanılır. Bütün günlere uygulanır.</span></div></form>`;
   };
 
   /* ---------- Bugün ---------- */
@@ -53,8 +67,8 @@
     if (g === bg) {
       const gl = Object.values(Y.ADIM).filter(a => Y.etkin(a) < bg && !Y.S.done[a.id] && !Y.gizliMi(a.id)).sort((x, y) => (Y.etkin(x) < Y.etkin(y) ? -1 : Y.etkin(x) > Y.etkin(y) ? 1 : KI.get(x.t) - KI.get(y.t)));
       if (gl.length) h += `<section class="kart yigin">${grup('', 'Önce bunlar · ' + gl.length + ' geride kalan', gl.slice(0, acik.geri ? 80 : 5).map(a => gorevSatiri(a, true)).join(''))}${gl.length > 5 ? `<div><button class="dugme ikincil" data-ac="geri">${acik.geri ? 'Daha az göster' : 'Hepsini göster (' + gl.length + ')'}</button></div>` : ''}${gl.length >= 4 ? `<div class="cipler"><button class="dugme ikincil" data-yay="7">1 haftaya yay</button><button class="dugme ikincil" data-yay="14">2 haftaya yay</button></div><div class="kucuk">Geride kalanları önündeki günlere eşit dağıtır; programın geri kalanı değişmez.</div>` : ''}</section>`;
-      if (bilgi) h += `<div class="not">${esc(bilgi)}</div>`;
     }
+    if (bilgi) h += `<div class="not">${esc(bilgi)}</div>`;
 
     const adimlar = Y.gunAdimlari(g).map(id => Y.ADIM[id]);
     const gruplar = {};
@@ -80,14 +94,18 @@
       ${liste}${bosNot}
       ${grup('n-geo', 'Benim görevlerim', Y.ozelGun(g).map(o => {
         const on = !!Y.S.done[o.id];
-        const sil = ozelSilBekle === o.id
+        const sil0 = ozelSilBekle === o.id
           ? (o.tekrar ? `<span class="cipler"><button class="izle" data-osil-gun="${esc(o.id)}">Bu günü</button><button class="izle" data-osil-hep="${esc(o.seri)}">Hepsini</button></span>` : `<button class="izle" data-osil-hep="${esc(o.seri)}">Emin misin?</button>`)
           : `<button class="izle" data-osil="${esc(o.id)}" aria-label="${esc(o.ad)} görevini sil">Sil</button>`;
-        return `<div class="gorev${on ? ' bitti' : ''}">${kalp(o.id, on, o.ad)}<div class="ad">${esc(o.ad)}${o.tekrar ? `<small>${Y.TEKRAR_AD[o.tekrar]}</small>` : ''}</div>${sil}</div>`;
+        const sil = duzenle && ozelSilBekle !== o.id ? `<span class="islem"><button class="izle" data-duzelt="${esc(o.seri)}" aria-label="${esc(o.ad)} görevinin yazısını düzelt">Düzelt</button>${o.tekrar ? '' : `<button class="izle" data-tas="o:${esc(o.seri)}" aria-label="${esc(o.ad)} görevini başka güne taşı">Taşı</button>`}${sil0}</span>` : sil0;
+        const form = duzeltAcik === o.seri ? `<form id="duzeltForm" class="satir-form"><input id="duzeltAd" maxlength="140" value="${esc(o.ad)}" aria-label="Görevin yeni yazısı" autocomplete="off"><button class="dugme" type="submit">Kaydet</button><button class="dugme ikincil" type="button" data-iptal="1">Vazgeç</button>${o.tekrar ? '<span class="kucuk">Bütün günlerde değişir.</span>' : ''}</form>` : tasFormu('o:' + o.seri, g);
+        return `<div class="gorev${on ? ' bitti' : ''}">${kalp(o.id, on, o.ad)}<div class="ad">${esc(o.ad)}${o.tekrar ? `<small>${Y.TEKRAR_AD[o.tekrar]}</small>` : ''}</div>${sil}</div>${form}`;
       }).join('') + `<form id="ozelForm" class="yigin" style="gap:8px;padding-top:8px"><input id="ozelAd" maxlength="140" placeholder="+ Görev ekle (ör. kitapçıya git)" autocomplete="off" aria-label="Yeni görev"><div class="cipler" style="align-items:center"><select id="ozelTekrar" aria-label="Tekrar" style="width:auto"><option value="">Bir kez (${esc(Y.yaz(g))})</option><option value="gun">Her gün</option><option value="hafta">Her hafta ${esc(Y.GUN[Y.D(g).getDay()])}</option></select><button class="dugme" type="submit">Ekle</button></div></form>`)}
       ${(() => { const gz = Y.gunGizlenen(g); return gz.length ? `<div class="kucuk">Bu günden kaldırdıkların: ${gz.length} · <button class="izle" data-geri="${esc(g)}">Geri getir</button></div>` : ''; })()}
-      <div><button class="dugme ikincil" data-duzenle="1">${duzenle ? 'Düzenlemeyi bitir' : 'Düzenle: programın görevlerini kaldır'}</button></div>
-      ${her.length ? grup('n-gun', 'Her gün', her.map(x => ekSatir(x, true)).join('')) : ''}
+      <div><button class="dugme ikincil" data-duzenle="1">${duzenle ? 'Düzenlemeyi bitir' : 'Düzenle: düzelt, taşı, kaldır'}</button></div>
+      ${duzenle ? '<div class="kucuk">Taşı: görev seçtiğin güne gider. Kaldır: yalnız bu günden çıkar, "Geri getir" ile döner. Konu adımlarını kaldırırsan o konu Konular sekmesinde eksik görünür.</div>' : ''}
+      ${her.length ? grup('n-gun', 'Her gün', her.map(x => ekSatir(x, true, true)).join('')) : ''}
+      ${duzenle ? ayarFormu() : ''}
     </section>
     <section class="kart yigin"><div class="etiket">Bir konu nasıl biter?</div>
       <div>Video, özet ve kolay test <b>aynı gün</b>. Orta test 2 gün sonra, zor test 1 hafta sonra listene kendiliğinden gelir. Videoları 1,25x hızda izle; özeti videoya bakmadan, kendi cümlelerinle yaz.</div>
@@ -191,7 +209,7 @@
         </div></details>
     </section>`;
   }
-  let eMesaj = '', eOnay = false, tasiMesaj = '', ozelSilBekle = null, duzenle = false;
+  let eMesaj = '', eOnay = false, tasiMesaj = '', ozelSilBekle = null, duzenle = false, tasAcik = null, duzeltAcik = null;
   function esleBolumu() {
     const ac = Y.senkronVar();
     const ic = ac
@@ -317,7 +335,7 @@
   window.addEventListener('hashchange', () => { const x = location.hash.slice(1); if (SEKMELER.includes(x) && x !== sekme) { sekme = x; ciz(true); } });
 
   document.addEventListener('click', e => {
-    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle],[data-tasi],[data-osil],[data-osil-gun],[data-osil-hep],[data-gizle],[data-geri],[data-duzenle]');
+    const b = e.target.closest('[data-t],[data-gun],[data-ac],[data-ders],[data-ay],[data-dtur],[data-sil],[data-yay],[data-yedek],[data-oto],[data-esle],[data-tasi],[data-osil],[data-osil-gun],[data-osil-hep],[data-gizle],[data-geri],[data-duzenle],[data-tas],[data-tasgun],[data-tasok],[data-iptal],[data-duzelt],[data-hergun]');
     if (!b) return;
     const ds = b.dataset;
     if (ds.t) return Y.isaretle(ds.t);
@@ -333,8 +351,18 @@
     if (ds.osilGun) { ozelSilBekle = null; return Y.gizle(ds.osilGun, true); }
     if (ds.osilHep) { ozelSilBekle = null; return Y.ozelSil(ds.osilHep); }
     if (ds.gizle) return Y.gizle(ds.gizle, true);
-    if (ds.geri) { const l = Y.gunGizlenen(ds.geri); l.forEach(id => { Y.S.gizli[id] = { v: false, t: Date.now() }; }); return Y.kaydet(); }
-    if (ds.duzenle) { duzenle = !duzenle; return ciz(false); }
+    if (ds.hergun) return Y.herGundenKaldir(ds.hergun);
+    if (ds.geri) return Y.geriGetir(ds.geri);
+    if (ds.duzenle) { duzenle = !duzenle; tasAcik = null; duzeltAcik = null; ozelSilBekle = null; return ciz(false); }
+    if (ds.tas) { tasAcik = tasAcik === ds.tas ? null : ds.tas; duzeltAcik = null; return ciz(false); }
+    if (ds.duzelt) { duzeltAcik = duzeltAcik === ds.duzelt ? null : ds.duzelt; tasAcik = null; ciz(false); const i = $('#duzeltAd'); if (i) { i.focus(); i.select(); } return; }
+    if (ds.iptal) { tasAcik = null; duzeltAcik = null; return ciz(false); }
+    if (ds.tasgun || ds.tasok) {
+      const hedef = ds.tasgun || (($('#tasTarih') || {}).value || ''), k = tasAcik || '';
+      const oldu = k.startsWith('a:') ? Y.tasi(k.slice(2), hedef) : k.startsWith('o:') ? Y.ozelTasi(k.slice(2), hedef) : false;
+      if (!oldu) { bilgi = 'Bu tarihe taşınamadı. 1 Kasım 2026 ile 20 Haziran 2027 arasında bir gün seç.'; return ciz(false); }
+      tasAcik = null; bilgi = 'Görev ' + Y.yaz(hedef, true) + ' gününe taşındı.'; return ciz(false);
+    }
     if (ds.tasi) { tasiMesaj = 'Kaydediliyor…'; ciz(false); Y.yeniAdreseGec().then(h => { tasiMesaj = h; ciz(false); }); return; }
     if (ds.oto) {
       if (yOnay !== ds.oto) { yOnay = ds.oto; return ciz(false); }
@@ -365,6 +393,17 @@
       const ad = $('#ozelAd').value;
       if (Y.ozelEkle(secGun || Y.bugun(), ad, ($('#ozelTekrar') || {}).value)) { const i = $('#ozelAd'); if (i) i.focus(); }
       return;
+    }
+    if (e.target.id === 'duzeltForm') {
+      e.preventDefault();
+      if (Y.ozelDuzelt(duzeltAcik, ($('#duzeltAd') || {}).value)) { duzeltAcik = null; ciz(false); }
+      return;
+    }
+    if (e.target.id === 'ayarForm') {
+      e.preventDefault();
+      Y.ayarla(($('#ayarPar') || {}).value, ($('#ayarMat') || {}).value);
+      bilgi = 'Günlük soru sayıları kaydedildi.';
+      return ciz(false);
     }
     if (e.target.id !== 'dForm') return;
     e.preventDefault();
