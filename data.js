@@ -64,28 +64,28 @@ window.YKS = (() => {
         ['Noktanın ve Doğrunun Analitiği', 'Analitik Geometri · nokta@Rehber Matematik ANALİTİK GEOMETRİ öğrenbitsin nokta|Analitik Geometri · doğru@Rehber Matematik ANALİTİK GEOMETRİ öğrenbitsin doğru']
       ] },
     { id: 'tr', ad: 'TYT Türkçe', kisa: 'Türkçe', sinav: 'TYT', serit: 'tr', cekirdek: true,
-      oneri: 'Rüştü Hoca ile Türkçe · Benim Hocam Türkçe-Edebiyat', ara: 'TYT Türkçe kampı ',
+      oneri: 'Benim Hocam Türkçe · Rüştü Hoca ile Türkçe', ara: 'Benim Hocam TYT Türkçe ',
       konular: L('Sözcükte Anlam|Cümlede Anlam|Paragrafta Anlam ve Yapı|Ses Bilgisi|Yazım Kuralları|Noktalama İşaretleri|Sözcükte Yapı (Ekler)|İsimler ve İsim Tamlamaları|Sıfatlar|Zamirler|Zarflar|Edat, Bağlaç, Ünlem|Fiiller: Kip, Kişi, Ek Fiil|Fiilimsiler|Fiilde Çatı|Cümlenin Ögeleri|Cümle Türleri|Anlatım Bozuklukları') },
     { id: 'tar', ad: 'TYT Tarih', kisa: 'Tarih', sinav: 'TYT', serit: 'sos',
-      oneri: 'Benim Hocam (Sadettin Akyayla) · Selami Yalçın · Hocalara Geldik', ara: 'TYT Tarih kampı ',
+      oneri: 'Benim Hocam Tarih · Selami Yalçın', ara: 'Benim Hocam TYT Tarih ',
       konular: L('Tarih ve Zaman|İnsanlığın İlk Dönemleri ve İlk Uygarlıklar|Orta Çağ\'da Dünya|İlk ve Orta Çağlarda Türk Dünyası|İslam Medeniyetinin Doğuşu|İlk Türk-İslam Devletleri|Selçuklu Türkiyesi|Beylikten Devlete Osmanlı (1302–1453)|Dünya Gücü Osmanlı (1453–1595)|Osmanlı Kültür ve Medeniyeti|Değişim Çağında Avrupa ve Osmanlı|En Uzun Yüzyıl (1774–1914)|20. Yüzyıl Başında Osmanlı ve I. Dünya Savaşı|Milli Mücadele|Atatürk İlkeleri ve İnkılaplar|Atatürk Dönemi Dış Politika') },
     { id: 'cog', ad: 'TYT Coğrafya', kisa: 'Coğrafya', sinav: 'TYT', serit: 'sos',
-      oneri: 'Benim Hocam (Bayram Meral) · Sosyal Hocam · Coğrafya Cepte', ara: 'TYT Coğrafya kampı ',
+      oneri: 'Benim Hocam Coğrafya · Coğrafya Cepte', ara: 'Benim Hocam TYT Coğrafya ',
       konular: L('Doğa, İnsan ve Dünya\'nın Hareketleri|Coğrafi Konum|Harita Bilgisi|Atmosfer ve Sıcaklık|Basınç ve Rüzgârlar|Nem, Yağış ve Buharlaşma|İklim Tipleri|İç Kuvvetler|Dış Kuvvetler|Su, Toprak ve Bitki Örtüsü|Nüfus|Göç ve Yerleşme|Türkiye\'nin Yer Şekilleri|Ekonomik Faaliyetler ve Bölgeler|Çevre ve Doğal Afetler') },
     { id: 'fel', ad: 'TYT Felsefe', kisa: 'Felsefe', sinav: 'TYT', serit: 'sos',
-      oneri: 'Benim Hocam (Can Köni) · Sosyal Hocam · Kampüs Felsefe', ara: 'TYT Felsefe kampı ',
+      oneri: 'Benim Hocam Felsefe · Sosyal Hocam', ara: 'Benim Hocam TYT Felsefe ',
       konular: L('Felsefeyi Tanıma|Felsefe ile Düşünme|Varlık Felsefesi|Bilgi Felsefesi|Bilim Felsefesi|Ahlak Felsefesi|Din Felsefesi|Siyaset Felsefesi|Sanat Felsefesi|Felsefe Tarihi (İlk Çağ – 20. yy)') },
     { id: 'din', ad: 'TYT Din Kültürü', kisa: 'Din', sinav: 'TYT', serit: 'sos',
-      oneri: 'Tek bir "TYT Din Kültürü kampı" listesi seç, sonuna kadar onunla git', ara: 'TYT Din Kültürü kampı ',
+      oneri: 'Benim Hocam Din Kültürü · tek bir kampla sonuna kadar git', ara: 'Benim Hocam TYT Din Kültürü ',
       konular: L('Bilgi ve İnanç|İslam ve İbadet|Ahlak ve Değerler|Hz. Muhammed ve Gençlik|Vahiy, Akıl ve Kur\'an|İslam Düşüncesinde Yorumlar|Din, Kültür ve Dünya Dinleri') },
     { id: 'fiz', ad: 'TYT Fizik', kisa: 'Fizik', sinav: 'TYT', serit: 'sos',
-      oneri: 'Umut Öncül · VİP Fizik · Hocalara Geldik', ara: 'TYT Fizik kampı ',
+      oneri: 'Benim Hocam Fizik · Umut Öncül', ara: 'Benim Hocam TYT Fizik ',
       konular: L('Fizik Bilimine Giriş ve Madde|Hareket|Kuvvet ve Newton Yasaları|İş, Güç, Enerji|Isı, Sıcaklık, Genleşme|Basınç ve Kaldırma Kuvveti|Elektrostatik|Elektrik Akımı ve Devreler|Manyetizma|Dalgalar|Optik') },
     { id: 'kim', ad: 'TYT Kimya', kisa: 'Kimya', sinav: 'TYT', serit: 'sos',
-      oneri: 'Kimya Adası · Benim Hocam (Görkem Şahin) · Kimya Özel', ara: 'TYT Kimya kampı ',
+      oneri: 'Benim Hocam Kimya (Görkem Şahin) · Kimya Adası', ara: 'Benim Hocam TYT Kimya ',
       konular: L('Kimya Bilimi|Atom ve Atom Modelleri|Periyodik Sistem|Kimyasal Türler Arası Etkileşimler|Maddenin Halleri|Kimyanın Temel Kanunları ve Mol|Kimyasal Tepkimeler ve Hesaplamalar|Karışımlar|Asitler, Bazlar, Tuzlar') },
     { id: 'bio', ad: 'TYT Biyoloji', kisa: 'Biyoloji', sinav: 'TYT', serit: 'sos',
-      oneri: 'Selin Hoca · Senin Biyolojin · FUNDAmentals Biyoloji', ara: 'TYT Biyoloji kampı ',
+      oneri: 'Benim Hocam Biyoloji · Selin Hoca', ara: 'Benim Hocam TYT Biyoloji ',
       konular: L('Canlıların Ortak Özellikleri ve İnorganik Maddeler|Organik Maddeler|Enzimler, Vitaminler, Nükleik Asitler, ATP|Hücre ve Organeller|Hücre Zarından Madde Geçişi|Canlıların Sınıflandırılması|Hücre Bölünmeleri ve Üreme|Kalıtım|Ekosistem Ekolojisi ve Çevre Sorunları') },
     { id: 'amat', ad: 'AYT Matematik', kisa: 'AYT Mat', sinav: 'AYT', serit: 'mat', cekirdek: true,
       kanal: 'Rehber Matematik', liste: '65 Günde AYT Matematik Kampı · 2026 Tayfa (66 ders)',
@@ -113,13 +113,13 @@ window.YKS = (() => {
         ['Dönüşüm Geometrisi', 'Dönüşüm Geometrisi@Rehber Matematik dönüşüm geometrisi']
       ] },
     { id: 'edb', ad: 'AYT Edebiyat', kisa: 'Edebiyat', sinav: 'AYT', serit: 'tr', cekirdek: true,
-      oneri: 'Fulya Hoca · Benim Hocam Türkçe-Edebiyat · Rüştü Hoca', ara: 'AYT Edebiyat kampı ',
+      oneri: 'Benim Hocam Edebiyat · Fulya Hoca', ara: 'Benim Hocam AYT Edebiyat ',
       konular: L('Şiir Bilgisi: Nazım Birimi, Ölçü, Uyak|Söz Sanatları|Öğretici Metinler|Anlatmaya Bağlı Metinler|Göstermeye Bağlı Metinler (Tiyatro)|İslamiyet Öncesi Türk Edebiyatı|Geçiş Dönemi Eserleri|Halk Edebiyatı|Divan Edebiyatı|Tanzimat Edebiyatı|Servet-i Fünun ve Fecr-i Ati|Milli Edebiyat|Cumhuriyet Dönemi Şiiri (1923–1960)|Cumhuriyet Dönemi Şiiri (1960 sonrası)|Cumhuriyet Dönemi Roman ve Hikâye|Edebi Akımlar ve Dünya Edebiyatı') },
     { id: 'tar1', ad: 'AYT Tarih-1', kisa: 'Tarih-1', sinav: 'AYT', serit: 'sos',
-      oneri: 'TYT\'de hangi tarih kanalıyla gittiysen onun AYT listesi', ara: 'AYT Tarih kampı ',
+      oneri: 'Benim Hocam Tarih (TYT\'deki kanalın AYT listesi)', ara: 'Benim Hocam AYT Tarih ',
       konular: L('Tarih Bilimi ve İlk Uygarlıklar|İlk Türk Devletleri|İslam Tarihi ve Uygarlığı|Türk-İslam Devletleri|Türkiye Tarihi (Selçuklu)|Beylikten Devlete (1300–1453)|Dünya Gücü Osmanlı (1453–1600)|Osmanlı Kültür ve Medeniyeti|Arayış Yılları ve 18. Yüzyıl|En Uzun Yüzyıl (1800–1922)|Milli Mücadele|Atatürkçülük, İnkılaplar ve Dış Politika') },
     { id: 'cog1', ad: 'AYT Coğrafya-1', kisa: 'Coğrafya-1', sinav: 'AYT', serit: 'sos',
-      oneri: 'TYT\'de hangi coğrafya kanalıyla gittiysen onun AYT listesi', ara: 'AYT Coğrafya kampı ',
+      oneri: 'Benim Hocam Coğrafya (TYT\'deki kanalın AYT listesi)', ara: 'Benim Hocam AYT Coğrafya ',
       konular: L('Biyoçeşitlilik ve Ekosistemler|Nüfus Politikaları ve Türkiye\'de Nüfus|Türkiye\'de Yerleşme ve Göç|Ekonomik Faaliyetler ve Doğal Kaynaklar|Türkiye Ekonomisi: Tarım ve Hayvancılık|Türkiye Ekonomisi: Madenler, Enerji, Sanayi|Ulaşım, Ticaret, Turizm ve Kalkınma|Küresel Ortam ve Çevre Sorunları') }
   ];
 
@@ -158,24 +158,26 @@ window.YKS = (() => {
     z: { ad: 'Zor', uzun: 'Zor kitaptan test' }
   };
 
-  // Kitap seçimi (7 Kasım 2026 araştırması): kolay → orta → zor. Kişi Kaynaklar sekmesinden değiştirebilir.
+  // Kitap seçimi (16 Kasım 2026): kitap videoyla aynı kanaldan, konu konu birlikte ilerler.
+  // Büyük derslerde 2 kitap (videonun kitabı + soru bankası), diğerlerinde 1 set. Zor seviye: ÖSYM çıkmış soruları (ücretsiz).
   // ne: ne zaman alınır (simdi = TYT ilk 8 hafta, aralik = 4 Ocak'ta başlayan dersler, ocak = 31 Ocak kararından sonra)
+  const OSYM = 'ÖSYM çıkmış sorular · osym.gov.tr (ücretsiz)';
   const KITAP = {
-    tmat: { k: 'Rehber Matematik · 49 Günde TYT Matematik Kampı', r: '345 TYT Matematik', z: 'Bilgi Sarmal TYT Matematik', ne: 'simdi', not: 'Kolay kitap kampın kendi kitabı; videolardaki ödevler oradan. Problemlerde zorlanırsan ek olarak Karekök Rutin Olmayan Problemler.' },
-    tgeo: { k: 'Acil · Geometrinin İlacı', r: '345 TYT Geometri', z: 'Bilgi Sarmal TYT Geometri', ne: 'simdi' },
-    tr: { k: 'Hız ve Renk TYT Türkçe', r: 'Karekök TYT Türkçe', z: 'Bilgi Sarmal TYT Türkçe', ne: 'simdi', not: 'Her günkü paragraf için önce Hız ve Renk Paragraf, o bitince Bilgi Sarmal Paragraf.' },
-    tar: { k: 'Çözüm TYT Tarih', r: 'Palme TYT Tarih', z: 'Limit TYT Tarih', ne: 'simdi' },
-    cog: { k: 'Kültür TYT Coğrafya', r: 'Palme TYT Coğrafya', z: 'Limit TYT Coğrafya', ne: 'simdi' },
-    fel: { k: 'Benim Hocam TYT Felsefe', r: 'Palme TYT Felsefe', z: 'Limit TYT Felsefe', ne: 'simdi' },
-    din: { k: 'Hız ve Renk TYT Din Kültürü', r: '345 TYT Din Kültürü', z: 'Bilgi Sarmal TYT Din Kültürü', ne: 'aralik' },
-    fiz: { k: 'Hız ve Renk TYT Fizik', r: '345 TYT Fizik', z: 'ÖSYM çıkmış TYT soruları', ne: 'aralik' },
-    kim: { k: 'Hız ve Renk TYT Kimya', r: '345 TYT Kimya', z: 'ÖSYM çıkmış TYT soruları', ne: 'aralik' },
-    bio: { k: 'Dr. Biyoloji TYT', r: 'Biyotik TYT Biyoloji', z: 'ÖSYM çıkmış TYT soruları', ne: 'aralik' },
-    amat: { k: 'Rehber Matematik · 65 Günde AYT Matematik Kampı', r: '345 AYT Matematik', z: 'Bilgi Sarmal AYT Matematik', ne: 'ocak' },
-    ageo: { k: 'Karekök AYT Geometri · 1 yıldızlı testler', r: 'Karekök AYT Geometri · 2 yıldızlı testler', z: 'Karekök AYT Geometri · 3 yıldızlı testler', ne: 'ocak', not: 'Tek kitap yeter: Karekök\'ün testleri yıldız sayısıyla zorlaşıyor.' },
-    edb: { k: 'Okyanus AYT Edebiyat', r: '345 AYT Edebiyat', z: 'Limit AYT Edebiyat', ne: 'ocak', not: 'Özet çıkarırken yanına Limit Edebiyat El Kitabı iyi gider.' },
-    tar1: { k: 'Palme AYT Tarih', r: 'Limit AYT Tarih', z: 'Karekök YKS 2. Oturum Tarih', ne: 'ocak' },
-    cog1: { k: 'Yayın Denizi AYT Coğrafya', r: 'Palme AYT Coğrafya', z: 'Limit AYT Coğrafya', ne: 'ocak' }
+    tmat: { k: 'Rehber Matematik · 49 Günde TYT Matematik Kampı kitabı', r: '345 TYT Matematik Soru Bankası', z: '345 TYT Matematik · zor testler + ' + OSYM, ne: 'simdi', adet: 2, not: '1. kitap videoların kitabı: her dersin ödevi oradan. 2. kitap konu bitince pekiştirme.' },
+    tgeo: { k: 'Rehber Matematik · 49 Günde TYT Geometri Kampı kitabı', r: '345 TYT Geometri Soru Bankası', z: '345 TYT Geometri · zor testler + ' + OSYM, ne: 'simdi', adet: 2, not: 'Çember ve katı cisimler #öğrenbitsin videolarıyla gidiyor; testleri 345\'ten çöz.' },
+    tr: { k: 'Benim Hocam TYT Türkçe · ders notu + video çözümlü soru bankası', r: '345 TYT Türkçe Soru Bankası', z: OSYM, ne: 'simdi', adet: 2, not: 'Her günkü paragraf için 345 kitabının paragraf bölümünü kullan; bitince ÖSYM paragraf soruları.' },
+    tar: { k: 'Benim Hocam TYT Tarih · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Tarih · soru bankası (son testler)', z: OSYM, ne: 'simdi', adet: 1 },
+    cog: { k: 'Benim Hocam TYT Coğrafya · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Coğrafya · soru bankası (son testler)', z: OSYM, ne: 'simdi', adet: 1 },
+    fel: { k: 'Benim Hocam TYT Felsefe · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Felsefe · soru bankası (son testler)', z: OSYM, ne: 'simdi', adet: 1 },
+    din: { k: 'Benim Hocam TYT Din Kültürü · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Din Kültürü · soru bankası (son testler)', z: OSYM, ne: 'aralik', adet: 1 },
+    fiz: { k: 'Benim Hocam TYT Fizik · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Fizik · soru bankası (son testler)', z: OSYM, ne: 'aralik', adet: 1 },
+    kim: { k: 'Benim Hocam TYT Kimya · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Kimya · soru bankası (son testler)', z: OSYM, ne: 'aralik', adet: 1 },
+    bio: { k: 'Benim Hocam TYT Biyoloji · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam TYT Biyoloji · soru bankası (son testler)', z: OSYM, ne: 'aralik', adet: 1 },
+    amat: { k: 'Rehber Matematik · 65 Günde AYT Matematik Kampı kitabı', r: '345 AYT Matematik Soru Bankası', z: '345 AYT Matematik · zor testler + ' + OSYM, ne: 'ocak', adet: 2, not: '1. kitap videoların kitabı. Türev ve integralde 345\'in kolay testlerinden başla.' },
+    ageo: { k: 'Karekök AYT Geometri · 1 yıldızlı testler', r: 'Karekök AYT Geometri · 2 yıldızlı testler', z: 'Karekök AYT Geometri · 3 yıldızlı testler', ne: 'ocak', adet: 1, not: 'Tek kitap yeter: testler yıldız sayısıyla zorlaşıyor.' },
+    edb: { k: 'Benim Hocam AYT Edebiyat · ders notu + video çözümlü soru bankası', r: 'Karekök AYT Edebiyat Soru Bankası', z: OSYM, ne: 'ocak', adet: 2, not: 'Eşit ağırlığın en çok soru gelen sözel dersi (24 soru): iki kitap bunun için.' },
+    tar1: { k: 'Benim Hocam AYT Tarih · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam AYT Tarih · soru bankası (son testler)', z: OSYM, ne: 'ocak', adet: 1 },
+    cog1: { k: 'Benim Hocam AYT Coğrafya · ders notu + soru bankası (ilk testler)', r: 'Benim Hocam AYT Coğrafya · soru bankası (son testler)', z: OSYM, ne: 'ocak', adet: 1 }
   };
   DERS.forEach(d => { d.kitap = KITAP[d.id]; });
 
